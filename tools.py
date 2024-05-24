@@ -1,6 +1,8 @@
 import json
 import os
 import pandas as pd
+import os
+import csv
 
 import requests
 from sqlalchemy import create_engine,Engine,text
@@ -15,6 +17,8 @@ from langchain.agents import AgentType, Tool
 #from langchain.chat_models import ChatOpenAI
 from langchain_community.chat_models import ChatOpenAI
 #from langchain_openai import ChatOpenAI
+
+pgconnectionstring = os.getenv("pg_conn_string", "postgresql+psycopg2://postgres:password@localhost:5432/sqlalchemy")
 
 from llama_index.core.indices.struct_store.sql_query import (
     SQLTableRetrieverQueryEngine,
@@ -59,8 +63,7 @@ def createdatabaseengine(schema_: str) -> Engine:
     '''Creates  database engine for PostGreSQL database for the provided schema in the parameter. \
       This tool is needed to execute all DDL, DML and Queries for the given schema in the database. \
       The tool manages connection details to a database instance internally'''
-    #connection_string = "mysql+mysqlconnector://root:password@localhost:3306/sqlalchemy"
-    connection_string = "postgresql+psycopg2://postgres:password@localhost:5432/sqlalchemy"
+    connection_string = pgconnectionstring
     engine = create_engine(connection_string, echo=False,connect_args={'options': '-csearch_path={}'.format(schema_)})
     return engine
 
@@ -209,17 +212,34 @@ def is_json(myjson):
         return False
     return True
 
-def cleanuptojson(input):
-    #if JSON input contains ``` at the end, remove that and send only JSON part
+def is_csv(data):
+    iscsv = False
+    if not isinstance(data, str):
+        iscsv = False
+    try:
+        # Try to read the data using csv.reader
+        csv.Sniffer().sniff(data)
+        iscsv =  True
+    except csv.Error:
+        iscsv =  False
+    print(f"data:\n{data}\niscsv:{iscsv}")
+
+    return iscsv
+
+def cleanup(input):
+
     if input.endswith("```"):
         input = input[:-3]
-    #if JSON ends with ```, remove that and send only JSON part
+
     if input.startswith("```"):
         input = input[3:]
-    #replace all single quotes with double quotes
+
     input = input.replace("'",'"')
     return input
 
+def iserror(data):
+    if data.contains("psycopg2.OperationalError"):
+        return True
 #data = '[{"product_name": "Sony 65 inch 4K OLED A90J TV", "total_quantity": 3, "total_sales": 10499.97}, {"product_name": "iPhone 13 Pro", "total_quantity": 6, "total_sales": 5999.94}, {"product_name": "Samsung Galaxy Z Fold 3", "total_quantity": 2, "total_sales": 3599.98}, {"product_name": "Dell XPS 15 9510 Laptop", "total_quantity": 2, "total_sales": 3199.98}, {"product_name": "Amazon Echo Show 10 (3rd Gen)", "total_quantity": 4, "total_sales": 999.96}, {"product_name": "Bose QuietComfort 45 Headphones", "total_quantity": 3, "total_sales": 989.97}, {"product_name": "KitchenAid Artisan Stand Mixer", "total_quantity": 2, "total_sales": 799.98}, {"product_name": "Ninja Foodi 8-Quart 9-in-1 Pressure Cooker", "total_quantity": 3, "total_sales": 659.97}, {"product_name": "Cuisinart Grind & Brew 12-Cup Coffee Maker", "total_quantity": 5, "total_sales": 649.95}, {"product_name": "Instant Pot Duo Evo Plus 6-Quart", "total_quantity": 5, "total_sales": 599.95}]'
 #print(is_json(data))
 

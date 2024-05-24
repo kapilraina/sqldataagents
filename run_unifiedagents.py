@@ -7,7 +7,7 @@ import json
 import pandas as pd
 from tools import is_json
 import np
-from tools import is_json,cleanuptojson
+from tools import is_json,cleanup
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
@@ -37,7 +37,7 @@ if st.session_state.messages[-1]["role"] != "assistant":
                 print("\n")
                 print(data)
                 print("\n")
-                cleaneddata = cleanuptojson(data)
+                cleaneddata = cleanup(data)
                 print("-Cleaned-"*10)
                 print("\n")
                 print(cleaneddata)

@@ -67,6 +67,8 @@ class DataVisualization():
             4. For "charts" attribute Returns output as array, even if one chart type is determined.
             5. If there is no input data provided, return an empty object i.e. {}
             6. ALWAYS return the input data back in rawdata key, in the same format as passed.
+            7. ALWAYS return the exact same input data back, even when there are no charts determined i.e. for NO_CHART scenarios.
+            8. Never make any changes to input data
 			
             """
         )

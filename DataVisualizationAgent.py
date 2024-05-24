@@ -42,10 +42,7 @@ class DataVisualizationAgent():
                 Line Chart
                 Map
                 Scatter Chart
-
-                4. ALWAYS return the exact same input data back, even when there are no charts determined i.e. for NO_CHART scenarios.
-                5. Never make any changes to input data
-                6. Create keys from the input CSV header
+                4. Create keys from the input CSV header
 
                 ''',
                 backstory=dedent("""This dynamic agent is able to understand the kind of chart is possible from input data"""),
