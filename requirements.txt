@@ -8,7 +8,7 @@ nltk
 np
 
 crewai
-crewai[tools]
+#crewai[tools]
 #requests_aws4auth
 #boto3
 langchain_community
