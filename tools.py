@@ -17,6 +17,7 @@ from langchain.agents import AgentType, Tool
 #from langchain.chat_models import ChatOpenAI
 from langchain_community.chat_models import ChatOpenAI
 #from langchain_openai import ChatOpenAI
+from io import StringIO
 
 pgconnectionstring = os.getenv("pg_conn_string", "postgresql+psycopg2://postgres:password@localhost:5432/sqlalchemy")
 
@@ -95,6 +96,8 @@ def execute_naturallanguage_text_to_SQL_Inference(phrase: str, dbschema: str) ->
        Returns data in natural language format.
       The tool expects schema and a natural language phrase string to execute on a NLSQLTableQueryEngine engine.
       The tool returns a result in a natural language or an error indicating what may have be wrong with the execution of query.\
+      IMPORTANT : If there is an issue in interpreting the input phrase or cannot be converted into SQL, return immediately with 
+      response :Phrase cannot be converted into any valid inference in schema
       '''
     try:
         engine = createdatabaseengine(schema_=dbschema)
@@ -213,15 +216,18 @@ def is_json(myjson):
     return True
 
 def is_csv(data):
-    iscsv = False
-    if not isinstance(data, str):
-        iscsv = False
     try:
-        # Try to read the data using csv.reader
-        csv.Sniffer().sniff(data)
-        iscsv =  True
-    except csv.Error:
-        iscsv =  False
+        # Read the CSV data from the string
+        df = pd.read_csv(StringIO(data))
+        # Check if the DataFrame has headers and at least one data record
+        if df.empty or len(df.columns) < 1 or df.shape[0] < 1:
+            return False
+
+        return True
+    except Exception as e:
+        return False
+
+
     print(f"data:\n{data}\niscsv:{iscsv}")
 
     return iscsv
