@@ -21,12 +21,13 @@ class DataVisualizationCrew():
 
 
 class DataVisualizationCrewSA():
-    def __init__(self,input) -> None:
+    def __init__(self,input,query) -> None:
         self.input = input
+        self.query = query
     
     def run(self):
         agent =DataVisualizationAgent.unifiedstreamlitchartingAgent_o()
-        task = DataVisualization.convertinputtocompatiblecharting_o_sa(self.input,agent)
+        task = DataVisualization.convertinputtocompatiblecharting_o_sa(self.query,self.input,agent)
         crew = Crew(
                 agents=[agent],
                 tasks=[task],

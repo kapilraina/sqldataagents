@@ -38,7 +38,7 @@ class DataVisualization():
     def convertinputtocompatiblecharting_o(agent):
         return Task(
             description=f"""
-            Determine the chart types and chart data for each chart from the provided input. Augment the charting data to the input data.
+            Determine the chart types and chart data for each chart from the provided CSV input. Augment the charting data to the input data.
             For chart type determined, convert the input data that can be used to display this chart.
             .""",
             agent=agent,
@@ -48,9 +48,7 @@ class DataVisualization():
              For ANY outputs, do not include  ``` at the end.
             2. High level output JSON structure :
                 {
-                    rawdata": {
-                                #Input data passed to the agent
-                    },
+                    "rawdata": "",#Input csv data passed to the agent as list
                     "charts": [
                             {
                                 "chart_type": "...", # Type of Chart determined 
@@ -73,15 +71,18 @@ class DataVisualization():
             """
         )
 
-    def convertinputtocompatiblecharting_o_sa(input,agent):
+    def convertinputtocompatiblecharting_o_sa(query,data,agent):
         return Task(
             description=f"""
+            Determine the chart types and chart attributes for each chart from the provided input data structure. 
+            In addition use the intent from user query to determine the right chart types and attributes.
             ###
-            Input:
+            Input Data Structure:
+            {data}
             ###
-            {input}
+            User Intent Query:
+            {query}
             ###
-            Determine the chart types and chart attributes for each chart from the provided input. 
             For chart type determined, use the inputdata to determine the attributes that should be used to create the 
             chart.
             .""",
@@ -97,8 +98,9 @@ class DataVisualization():
                         "chart_type": "...", # Type of Chart determined 
                         "title": ".....", #title of the chart
                         "definition": {
-                            "x":[....], # represents the column name to be used on X-Axis
-                            "y":[....] # represents the column name to be used on Y-Axis
+                            "columns": {
+                                "x":"column_name", #single column name to use used on X axis of chart
+                                "y":"[column_name1","column_name2",...]" #multiple column names to use used on Y axis of chart if needed.  
                         }
                     }
                 ]
@@ -107,5 +109,6 @@ class DataVisualization():
             4. Even if one chart type is determined, return it as array
             5. If there is no input data provided, return an empty array.
             6. ALWAYS return a well-formed JSON object ONLY
+            7. DO NOT return ANY extra characters or text with the JSON. (such as 'my best complete final answer to the task.')
             """
         )

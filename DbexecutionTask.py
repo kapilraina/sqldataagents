@@ -10,6 +10,9 @@ class DbexecutionTask():
             ##
             If needed gather data from multiple tables based on the relationships defined in schema.
             """,
-            agent=agent
+            agent=agent,
+            expected_output="""
+            Single dataset based on the results of query or queries generated from the input
+            """
         )
     

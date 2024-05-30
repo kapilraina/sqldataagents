@@ -1,5 +1,5 @@
 -- Insert 10 records into the products table with real product names
-INSERT INTO products (product_name, category, price, stock_quantity) VALUES
+INSERT INTO sales.products (product_name, category, price, stock_quantity) VALUES
     ('iPhone 13 Pro', 'Smartphones', 999.99, 50),
     ('Samsung Galaxy Z Fold 3', 'Smartphones', 1799.99, 30),
     ('Dell XPS 15 9510 Laptop', 'Laptops', 1599.99, 25),
@@ -12,7 +12,7 @@ INSERT INTO products (product_name, category, price, stock_quantity) VALUES
     ('Ninja Foodi 8-Quart 9-in-1 Pressure Cooker', 'Kitchen Appliances', 219.99, 40);
 
 -- Insert 10 records into the customers table with real names
-INSERT INTO customers (first_name, last_name, email, phone, address) VALUES
+INSERT INTO sales.customers (first_name, last_name, email, phone, address) VALUES
     ('John', 'Doe', 'johndoe@example.com', '123-456-7890', '123 Main St, Anytown, USA'),
     ('Jane', 'Smith', 'janesmith@example.com', '987-654-3210', '456 Elm St, Othertown, USA'),
     ('Alice', 'Johnson', 'alicejohnson@example.com', '555-123-4567', '789 Oak St, Yetanothertown, USA'),
@@ -25,7 +25,7 @@ INSERT INTO customers (first_name, last_name, email, phone, address) VALUES
     ('Christopher', 'Garcia', 'christophergarcia@example.com', '222-333-4444', '333 Peach St, Anytown, USA');
 
 -- Insert 10 records into the orders table with real order data
-INSERT INTO orders (customer_id, total_amount) VALUES
+INSERT INTO sales.orders (customer_id, total_amount) VALUES
     (1, 1499.98),
     (2, 3299.97),
     (3, 249.99),
@@ -38,7 +38,7 @@ INSERT INTO orders (customer_id, total_amount) VALUES
     (10, 1099.97);
 
 -- Insert 20 records into the order_details table with real order details
-INSERT INTO order_details (order_id, product_id, quantity, unit_price, total_price) VALUES
+INSERT INTO sales.order_details (order_id, product_id, quantity, unit_price, total_price) VALUES
     (1, 1, 2, 999.99, 1999.98),
     (2, 2, 1, 1799.99, 1799.99),
     (3, 3, 1, 1599.99, 1599.99),

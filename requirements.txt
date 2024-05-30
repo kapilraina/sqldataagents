@@ -13,3 +13,4 @@ crewai
 #boto3
 langchain_community
 langchain-openai
+datetime

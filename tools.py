@@ -15,7 +15,8 @@ from llama_index.llms.openai import OpenAI
 from langchain_community.utilities import GoogleSerperAPIWrapper
 from langchain.agents import AgentType, Tool
 #from langchain.chat_models import ChatOpenAI
-from langchain_community.chat_models import ChatOpenAI
+#from langchain_community.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 #from langchain_openai import ChatOpenAI
 from io import StringIO
 
@@ -33,23 +34,38 @@ from llama_index.core import VectorStoreIndex
 
 from llama_index.core.schema import NodeWithScore,TextNode
 from decimal import Decimal
-import datetime
+from datetime import datetime,date
 
 
-# Function to parse datetime and Decimal objects
-def custom_decoder(obj):
-    if isinstance(obj, datetime.datetime):
-        return obj.isoformat()
-    if isinstance(obj, Decimal):
-        return float(obj)
-    return obj
+class CustomEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, date):
+            return obj.strftime('%Y-%m-%d')
+        elif isinstance(obj, Decimal):
+            return float(obj)
+        return super().default(obj)
+
+
 def convertNodeDataToJson(data):
+    print(f"Converting NodeWithScore to JSON. Recs = {len(data)}")
     extracted = []
     for node in data:
         meta = node.metadata
         extracted.append(meta)
-    return json.dumps(extracted,default=custom_decoder)
+    returnable =  json.dumps(extracted,cls=CustomEncoder,check_circular=True)
+    print(f"returnable:\n {returnable}")
+    return returnable
 
+# Function to generate JSON of header attribute names with their data types
+def generate_header_attributes_json(df):
+
+    # Get column names and their types
+    column_info = {col: str(df[col].dtype) for col in df.columns}
+
+    # Convert to JSON format
+    column_info_json = json.dumps(column_info, indent=4)
+
+    return column_info_json
 
 all_tables =["customers","order_details","orders","products"]
 
@@ -131,6 +147,8 @@ def execute_naturallanguage_text_to_SQL_Retrieval(phrase: str, dbschema: str) ->
         print(f"\n{res}")
 
         convertedres = convertNodeDataToJson(res)
+        if len(convertedres) == 0:
+            return ""
         print("\n\nexecute_naturallanguage_text_to_SQL_Retrieval")
         print("-to JSON-"*10)
         print(f"\n{convertedres}")
