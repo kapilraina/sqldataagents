@@ -39,7 +39,7 @@ def displaychart(jdata,st):
                 st.map(cdf,x=_cols_[0],y=_cols_[1])   
 
 
-st.header("Agent Powered Information Bot 💬 📚")
+st.header("Agentic Analytics Bot ")
 
 if "messages" not in st.session_state.keys(): # Initialize the chat message history
     st.session_state.messages = [
