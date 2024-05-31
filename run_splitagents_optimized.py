@@ -21,11 +21,11 @@ def displaychart(chartsdata,dfd,st):
             st.subheader(jchartdata['title'])
             chardef = jchartdata["definition"]["columns"]
 
-            if len(chardef["y"]) == 1:
-                _cols_=[chardef["x"],chardef["y"][0]]
-            else:
-                _cols_=[chardef["x"],chardef["y"][0],chardef["y"][1]]
-            
+            #if len(chardef["y"]) == 1:
+            #    _cols_=[chardef["x"],chardef["y"][0]]
+            #else:
+            #    _cols_=[chardef["x"],chardef["y"][0],chardef["y"][1]]
+            _cols_=[chardef["x"],chardef["y"]]
             _x_ = df[_cols_[0]]
             _y_ = df[_cols_[1]]
         
@@ -83,14 +83,22 @@ if st.session_state.messages[-1]["role"] != "assistant":
                         for rd in cdata:
                             #check if rawdata is an object
                             if isinstance(rd, dict):
-                                st.json(rd)
+                                #st.json(rd)
+                                st.table(pd.DataFrame([rd]))
                             else:
                                 st.markdown(rd)
+                    elif isinstance(cdata, dict):
+                        #st.json(cdata)
+                        #st.table(pd.DataFrame([cdata]))
+                        st.dataframe(pd.DataFrame([cdata]), height=200,hide_index=True,use_container_width=True)
+                    else:
+                        st.markdown(cdata)
                 else:
                     df = pd.read_csv(StringIO(cdata))
                     print("-df -"*7)
                     print(df)
-                    st.table(df.to_dict())
+                    #st.table(df.to_dict())
+                    st.dataframe(df, height=200,hide_index=True,use_container_width=True)
                     if len(df) > 500:
                         st.markdown("Too many rows to visualize..skipping")
                     else:

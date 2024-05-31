@@ -92,16 +92,26 @@ if st.session_state.messages[-1]["role"] != "assistant":
                             if is_csv(rawdata):
                                 df = pd.read_csv(StringIO(rawdata))   
                                 #df = pd.DataFrame(rawdata)
-                                st.table(df.to_dict()) 
+                                #st.table(df.to_dict()) 
+                                st.dataframe(df, height=200,hide_index=True,use_container_width=True)
                             #check of rawdata is an array
                             elif isinstance(rawdata, list):
                                 for rd in rawdata:
                                     #check if rawdata is an object
                                     if isinstance(rd, dict):
-                                        st.json(rd)
+                                        #st.table(pd.DataFrame([rd]))
+                                        st.dataframe(pd.DataFrame([rd]), height=200,hide_index=True,use_container_width=True)
                                     else:
                                         st.markdown(rd)
-                                         
+                            elif isinstance(rawdata, dict):
+                                #st.table(pd.DataFrame([rawdata]))
+                                st.dataframe(pd.DataFrame([rawdata]), height=200,hide_index=True,use_container_width=True)
+                                
+                            else:
+                                st.markdown(rawdata)
+
+
+
                             #Chart thing
                             displaychart(jdata,st)
                             message = {"role": "chartassistant", "content": jdata}

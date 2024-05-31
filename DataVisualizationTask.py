@@ -100,7 +100,7 @@ class DataVisualization():
                         "definition": {
                             "columns": {
                                 "x":"column_name", #single column name to use used on X axis of chart
-                                "y":"[column_name1","column_name2",...]" #multiple column names to use used on Y axis of chart if needed.  
+                                "y":"column_name1" #single column name to use used on Y axis of chart  
                         }
                     }
                 ]
