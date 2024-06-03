@@ -98,7 +98,7 @@ ALTER TABLE ONLY sales.customers ALTER COLUMN customer_id SET DEFAULT nextval('s
 CREATE TABLE sales.orders (
     order_id integer NOT NULL,
     customer_id integer,
-    order_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    order_date date DEFAULT CURRENT_TIMESTAMP,
     total_amount numeric(10,2) NOT NULL
 );
 
