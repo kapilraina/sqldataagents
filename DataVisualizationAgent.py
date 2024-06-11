@@ -5,7 +5,7 @@ from tools import (
     execute_naturallanguage_text_to_SQL_Inference,
     execute_naturallanguage_text_to_SQL_Retrieval,
     searchtool,
-    getgpt4llm
+    getllm
 )
 import logging
 import os
@@ -49,7 +49,7 @@ class DataVisualizationAgent():
                 #tools=[searchtool()],
                 verbose=True,
                 allow_delegation=True,
-                llm=getgpt4llm(temperature=0.2),
+                llm=getllm(temperature=0.2),
                 max_iterations=2
             )
             return chartingAgent

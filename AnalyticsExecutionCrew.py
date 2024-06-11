@@ -4,6 +4,7 @@ from DbexecutionAgent import DbexecutionAgent
 from DataVisualizationAgent import DataVisualizationAgent
 
 from crewai import Agent, Task, Crew, Process
+from tools import getllm
 
 class AnalyticsCrew():
     def __init__(self,schema, query) -> None:
@@ -19,7 +20,8 @@ class AnalyticsCrew():
         crew = Crew(
                 agents=[dbagent,chartagent],
                 tasks=[datatask,charttask],
-                verbose=2
+                verbose=2,
+                manager_llm=getllm(temperature=0.2)
              )
 
         res = crew.kickoff()

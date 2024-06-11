@@ -4,9 +4,7 @@ from tools import (
     execute_database_query,
     execute_naturallanguage_text_to_SQL_Inference,
     execute_naturallanguage_text_to_SQL_Retrieval,
-    execute_naturallanguage_text_to_SQL_InferenceWithSchemaIndex,
-    searchtool,
-    getgpt4llm
+    getllm
 )
 import logging
 import sys
@@ -24,7 +22,7 @@ class DbexecutionAgent():
                 tools=[execute_database_query],
                 verbose=True,
                 allow_delegation=True,
-                llm=getgpt4llm(),
+                llm=getllm(temperature=0.2),
                 max_iterations=2
         )
         return dbexecutionAgent
@@ -37,7 +35,7 @@ class DbexecutionAgent():
             tools=[execute_naturallanguage_text_to_SQL_Inference],
             verbose=True,
             allow_delegation=True,
-            llm=getgpt4llm(),
+            llm=getllm(temperature=0.2),
             max_iterations=2
         )
         return nldbexecutionAgent
@@ -67,7 +65,7 @@ class DbexecutionAgent():
                 ],
             verbose=True,
             allow_delegation=True,
-            llm=getgpt4llm(),
+            llm=getllm(temperature=0.2),
             max_iterations=2
         )
         return genericdbexecutionAgent

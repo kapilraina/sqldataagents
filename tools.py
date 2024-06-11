@@ -9,32 +9,32 @@ from sqlalchemy import create_engine,Engine,text
 from langchain.tools import tool
 from llama_index.core import SQLDatabase
 from llama_index.core.query_engine import NLSQLTableQueryEngine
-from llama_index.core.query_engine import RetrieverQueryEngine
+#from llama_index.core.query_engine import RetrieverQueryEngine
 from llama_index.core.retrievers import NLSQLRetriever
-from llama_index.llms.openai import OpenAI
 from langchain_community.utilities import GoogleSerperAPIWrapper
 from langchain.agents import AgentType, Tool
-#from langchain.chat_models import ChatOpenAI
-#from langchain_community.chat_models import ChatOpenAI
-from langchain_openai import ChatOpenAI
-#from langchain_openai import ChatOpenAI
+from langchain_aws import ChatBedrock
 from io import StringIO
 
 pgconnectionstring = os.getenv("pg_conn_string", "postgresql+psycopg2://postgres:password@localhost:5432/sqlalchemy")
 
+'''
 from llama_index.core.indices.struct_store.sql_query import (
     SQLTableRetrieverQueryEngine,
 )
+
 from llama_index.core.objects import (
     SQLTableNodeMapping,
     ObjectIndex,
     SQLTableSchema,
 )
+
 from llama_index.core import VectorStoreIndex
+'''
 
 from llama_index.core.schema import NodeWithScore,TextNode
 from decimal import Decimal
-from datetime import datetime,date
+from datetime import date
 
 
 class CustomEncoder(json.JSONEncoder):
@@ -70,9 +70,13 @@ def generate_header_attributes_json(df):
 all_tables =["customers","order_details","orders","products"]
 
 def getNLSQLRetriever(dbschema: str):
+     print("|||||||| Fetching NLSQL Retriever")
      engine = createdatabaseengine(schema_=dbschema)
+     print("|||||||| DB Engine Created")
      sql_database = SQLDatabase(engine)
-     nl_sql_retriever = NLSQLRetriever(sql_database=sql_database,return_raw=False,llm=None)
+     print("|||||||| SQL DB Created")
+     nl_sql_retriever = NLSQLRetriever(sql_database=sql_database,return_raw=False)
+     print("|||||||| NLSQL Retriever Created")
      return nl_sql_retriever
 
 #@tool("SQL Database Engine Creator")
@@ -118,7 +122,7 @@ def execute_naturallanguage_text_to_SQL_Inference(phrase: str, dbschema: str) ->
     try:
         engine = createdatabaseengine(schema_=dbschema)
         sql_database = SQLDatabase(engine)
-        engine = NLSQLTableQueryEngine(sql_database=sql_database,llm=getgpt4llm())
+        engine = NLSQLTableQueryEngine(sql_database=sql_database,llm=getllm())
         res = engine.query(phrase)
         print(f"\n{res}")
         return res
@@ -139,7 +143,8 @@ def execute_naturallanguage_text_to_SQL_Retrieval(phrase: str, dbschema: str) ->
     '''
     try: 
         nl_sql_retriever = getNLSQLRetriever(dbschema=dbschema)
-        query_engine = RetrieverQueryEngine.from_args(nl_sql_retriever)
+        nl_sql_retriever._llm=getllm()
+        #query_engine = RetrieverQueryEngine.from_args(nl_sql_retriever,llm=getllm())
         res = nl_sql_retriever.retrieve(phrase)
         #res=query_engine.query(phrase)
         print("\n\n")
@@ -167,36 +172,7 @@ def execute_naturallanguage_text_to_SQL_Retrieval(phrase: str, dbschema: str) ->
     
     except Exception as e:
         return f"Error executing statement. {e}"
-    
-#@tool("Natural Language to query for simple inferencing")
-def execute_naturallanguage_text_to_SQL_InferenceWithSchemaIndex(phrase: str, dbschema: str) -> str:
-    '''Uses the SQLTableRetrieverQueryEngine framework to create a query engine that understands natural language inputs
-       and generates appropriate SQLs internally for execution and respond with natural language inferencing.
-      The tool expects schema and a natural language phrase string to execute on a SQLTableRetrieverQueryEngine engine.
-      The tool returns a result or an error indicating what may have be wrong with the execution of query.\
-      '''
-    try:
-        engine = createdatabaseengine(schema_=dbschema)
-        sql_database = SQLDatabase(engine)
-        table_node_mapping = SQLTableNodeMapping(sql_database)
-        table_schema_objs = [SQLTableSchema(table_name=table) for table in all_tables]
-        obj_index = ObjectIndex.from_objects(
-                                                table_schema_objs,
-                                                table_node_mapping,
-                                                VectorStoreIndex,
-                                            )
-
-        engine =  SQLTableRetrieverQueryEngine(
-                                                sql_database=sql_database, 
-                                                table_retriever=obj_index.as_retriever(similarity_top_k=10),
-                                                llm=getgpt4llm()
-                                        )
-        res = engine.query(phrase)
-        print(f"\n{res}")
-        return res
-    except Exception as e:
-        return f"Error executing statement. {e}"
-
+ 
 def searchtool(): #tool("Current Search")
     search = GoogleSerperAPIWrapper(k=2)
     searchtool = Tool(
@@ -220,9 +196,36 @@ def getbedrockllm():
                     model_kwargs=model_kwargs_claude)
     return llm_claude
 '''
-def getgpt4llm(temperature=0.3):
+
+def getllm(temperature=0.3):
+    model_kwargs_claude = {"temperature": temperature}
+
+    #llama models dont work with agents. Ref : https://github.com/langchain-ai/langchain/issues/19220
+
+    '''
+    llm = ChatBedrock(credentials_profile_name="default",
+                        model_id="meta.llama2-70b-chat-v1",
+                        region_name="us-east-1",
+                        model_kwargs=model_kwargs_claude
+                        )
+    return llm
+    '''
     
-    llm = ChatOpenAI(model_name="gpt-4o", temperature=temperature)
+    #sonnet model doesnt work so well with NLSQL Reasoning
+    '''
+    llm = ChatBedrock(credentials_profile_name="default",
+                        model_id="anthropic.claude-3-sonnet-20240229-v1:0",
+                        region_name="us-east-1",
+                        model_kwargs=model_kwargs_claude
+                        )
+    '''
+    #Switching to Opus
+    llm = ChatBedrock(credentials_profile_name="default",
+                    model_id="anthropic.claude-3-opus-20240229-v1:0",
+                    region_name="us-west-2",
+                    model_kwargs=model_kwargs_claude
+                    )
+    
     return llm
 
 def is_json(myjson):

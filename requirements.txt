@@ -1,9 +1,7 @@
 llama-index
 qdrant_client
-llama-index-llms-openai
 psycopg2-binary
 streamlit
-openai
 nltk
 np
 
@@ -12,5 +10,5 @@ crewai
 #requests_aws4auth
 #boto3
 langchain_community
-langchain-openai
+langchain_aws
 datetime
