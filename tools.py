@@ -198,7 +198,7 @@ def getbedrockllm():
 '''
 
 def getllm(temperature=0.3):
-    model_kwargs_claude = {"temperature": temperature}
+    model_kwargs_claude = {"temperature": 0.8}
 
     #llama models dont work with agents. Ref : https://github.com/langchain-ai/langchain/issues/19220
 
@@ -219,13 +219,22 @@ def getllm(temperature=0.3):
                         model_kwargs=model_kwargs_claude
                         )
     '''
+    #haiku model doesnt work so well with NLSQL Reasoning
+    '''
+    llm = ChatBedrock(credentials_profile_name="default",
+                model_id="anthropic.claude-3-haiku-20240307-v1:0",
+                region_name="us-east-1",
+                model_kwargs=model_kwargs_claude
+                )  
+    '''
     #Switching to Opus
     llm = ChatBedrock(credentials_profile_name="default",
                     model_id="anthropic.claude-3-opus-20240229-v1:0",
                     region_name="us-west-2",
                     model_kwargs=model_kwargs_claude
                     )
-    
+
+
     return llm
 
 def is_json(myjson):
